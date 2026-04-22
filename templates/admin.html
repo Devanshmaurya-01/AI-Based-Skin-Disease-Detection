@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+    font-family:Poppins;
+    background:#0f172a;
+    color:white;
+    margin:0;
+    padding:0;
+}
+
+/* HEADER */
+.header{
+    text-align:center;
+    padding:20px;
+    font-size:24px;
+    font-weight:600;
+}
+
+/* CARDS */
+.cards{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    margin:20px;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+    width:200px;
+    text-align:center;
+    box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
+
+.card h3{
+    margin:0;
+    font-size:18px;
+}
+
+.card p{
+    font-size:22px;
+    margin-top:10px;
+    color:#22c55e;
+}
+
+/* GRAPH */
+.graph{
+    width:80%;
+    margin:auto;
+    margin-top:30px;
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+}
+
+/* SEARCH */
+.search-box{
+    margin-top:30px;
+    text-align:center;
+}
+
+.search-box input{
+    padding:10px;
+    width:300px;
+    border-radius:8px;
+    border:none;
+}
+
+/* TABLE */
+table{
+    width:90%;
+    margin:auto;
+    margin-top:20px;
+    border-collapse:collapse;
+}
+
+th, td{
+    padding:12px;
+    border-bottom:1px solid #ffffff22;
+}
+
+tr:hover{
+    background:#1e293b;
+}
+
+th{
+    background:#06b6d4;
+    color:black;
+}
+
+/* DELETE BUTTON */
+.delete-btn{
+    background:#ef4444;
+    border:none;
+    padding:6px 10px;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+}
+
+/* BACK BUTTON */
+button{
+    margin:30px;
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    background:#22c55e;
+    color:white;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">📊 Admin Dashboard</div>
+
+<!-- 🔥 CARDS -->
+<div class="cards">
+    <div class="card">
+        <h3>Total Users</h3>
+        <p>{{ total_users }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Total Reports</h3>
+        <p>{{ total_reports }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Daily Activity</h3>
+        <p>{{ daily_activity }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Predictions</h3>
+        <p>{{ predictions }}</p>
+    </div>
+</div>
+
+<!-- 🔥 GRAPH -->
+<div class="graph">
+    <h3 style="text-align:center;">📈 Daily Usage</h3>
+    <canvas id="dailyChart" style="height:250px;"></canvas>
+</div>
+
+<!-- 🔥 SEARCH -->
+<div class="search-box">
+    <input type="text" id="search" placeholder="🔍 Search user...">
+</div>
+
+<!-- 🔥 TABLE -->
+<table id="table">
+<tr>
+<th>Email</th>
+<th>Disease</th>
+<th>Confidence</th>
+<th>Action</th>
+</tr>
+
+{% for row in data %}
+<tr>
+<td>{{ row[0] }}</td>
+<td>{{ row[1] }}</td>
+<td>{{ row[2] }}%</td>
+<td>
+    <a href="/admin/delete/{{ row[3] }}">
+        <button class="delete-btn">Delete</button>
+    </a>
+</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<!-- 🔥 BACK -->
+<div style="text-align:center;">
+<a href="/"><button>⬅ Back</button></a>
+</div>
+
+<!-- 🔥 SEARCH SCRIPT -->
+<script>
+document.getElementById("search").addEventListener("keyup", function(){
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll("#table tr");
+
+    rows.forEach((row, index) => {
+        if(index === 0) return;
+        row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+    });
+});
+</script>
+
+<!-- 🔥 CHART SCRIPT -->
+<script>
+fetch('/admin/chart-data')
+.then(res => res.json())
+.then(data => {
+
+new Chart(document.getElementById("chart"), {
+    type: 'line',
+    data: {
+        labels: data.labels,
+        datasets: [{
+            label: "User Activity",
+            data: data.values,
+            borderColor: "#22c55e",
+            fill: false,
+            tension:0.3
+        }]
+    }
+});
+
+});
+
+const dataFromFlask = {{ daily_data|tojson }};
+
+const labels = dataFromFlask.map(item => item[0]);
+const values = dataFromFlask.map(item => item[1]);
+
+const ctx = document.getElementById('dailyChart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Daily Predictions',
+            data: values,
+            fill: true,
+            tension: 0.4
+        }]
+    }
+});
+</script>
+
+</body>
+</html>

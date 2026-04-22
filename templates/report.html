@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Medical Report</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:0;
+    background:#020617;
+    display:flex;
+    justify-content:center;
+}
+
+/* A4 PERFECT SIZE */
+.page{
+    width: 760px;
+    height: 1080px;
+
+    background:white;
+
+    border:3px solid #00c6ff;
+    border-radius:15px;
+
+    padding:20px;
+
+    box-shadow:0 0 40px rgba(0,198,255,0.4);
+
+    overflow:hidden;
+}
+
+/* HEADINGS */
+h1,h2{
+    text-align:center;
+    margin:10px 0;
+}
+
+/* RESULT */
+.result-box{
+    background:#22c55e;
+    padding:12px;
+    border-radius:10px;
+    text-align:center;
+    font-size:18px;
+    color:white;
+}
+
+/* IMAGE SECTION */
+.image-section{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+.image-section div{
+    text-align:center;
+}
+
+/* IMAGE */
+.image-section img{
+    width:230px;
+    height:230px;
+    object-fit:cover;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* TITLE ABOVE IMAGE */
+.image-section p{
+    font-weight:600;
+    margin-bottom:8px;
+    font-size:15px;
+}
+
+/* CLOSE BUTTON */
+.close-btn{
+    position:fixed;
+    top:20px;
+    right:20px;
+    font-size:26px;
+    font-weight:bold;
+    color:white;
+    cursor:pointer;
+    z-index:9999;
+    background:rgba(0,0,0,0.4);
+    padding:6px 12px;
+    border-radius:8px;
+}
+
+.close-btn:hover{
+    background:#00c6ff;
+    color:black;
+}
+
+hr{
+    margin:15px 0;
+}
+
+@media print {
+    .close-btn{
+        display:none;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<button class="close-btn" onclick="closeReport()">✖</button>
+<div class="page">
+
+<h1>🧬 DermaVision AI Lab</h1>
+<p style="text-align:center;">AI Powered Skin Disease Analysis Report</p>
+
+<hr>
+
+<h2> Patient Details</h2>
+<p><b>Name:</b> {{ name }}</p>
+<p><b>DOB:</b> {{ dob }}</p>
+<p><b>Gender:</b> {{ gender }}</p>
+
+<hr>
+
+<h2> Diagnosis Result</h2>
+
+<div class="result-box">
+{{ data.result }} ({{ data.confidence }}%)
+</div>
+
+<hr>
+
+<h2> Disease Info</h2>
+<p>{{ data.desc }}</p>
+
+<h2> Treatment</h2>
+<p>{{ data.treatment }}</p>
+
+<hr>
+
+<h2> Images</h2>
+
+<div class="image-section">
+
+<div>
+<p><b>Original</b></p>
+<img src="{{ data.image }}">
+</div>
+
+<div>
+<p><b>Heatmap</b></p>
+
+{% if data.heatmap %}
+<img src="{{ data.heatmap }}">
+{% else %}
+<p>No heatmap available</p>
+{% endif %}
+
+</div>
+
+</div>
+
+<hr>
+
+<h2> Note</h2>
+<p>
+This is an AI-generated report. Please consult a medical professional for accurate diagnosis.
+</p>
+
+</div>
+
+<script>
+function goBack(){
+    window.history.back();
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+
+//  FINAL STABLE PDF (NO IMAGE BUG)
+const urlParams = new URLSearchParams(window.location.search);
+
+if(urlParams.get("pdf") === "true"){
+
+    window.onload = function(){
+
+        const element = document.querySelector(".page");
+
+        setTimeout(()=>{
+            html2pdf().set({
+                margin: 0,
+                filename: 'DermaVision_Report.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
+
+            setTimeout(()=>{
+                window.close();
+            },1000);
+
+        },1000); //  delay = images load
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+
+ let savedMode = localStorage.getItem("mode");
+
+ if(savedMode === "light"){
+     document.body.classList.add("light-mode");
+ } 
+
+});
+
+
+function closeReport(){
+    window.close();
+}
+
+</script>
+
+</body>
+</html>

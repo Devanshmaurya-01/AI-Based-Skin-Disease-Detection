@@ -1,0 +1,90 @@
+{
+  "Acne": {
+    "desc": "Acne is a common skin condition where hair follicles get clogged with oil and dead skin cells, leading to pimples, blackheads, and whiteheads, mainly on the face, chest, and back.",
+    "treatment": "Use salicylic acid or benzoyl peroxide face wash, keep skin clean, avoid oily products, and consult a dermatologist if severe."
+  },
+  "Actinic_Keratosis": {
+    "desc": "Actinic Keratosis appears as rough, scaly patches caused by long-term sun exposure and is considered a precancerous condition.",
+    "treatment": "Apply sunscreen regularly, avoid sun exposure, and treatments include cryotherapy or medicated creams."
+  },
+  "Benign_tumors": {
+    "desc": "Benign tumors are non-cancerous skin growths that do not spread to other parts of the body and are usually harmless.",
+    "treatment": "No treatment is needed unless they cause discomfort; removal can be done via surgery or laser."
+  },
+  "Bullous": {
+    "desc": "Bullous skin conditions cause large fluid-filled blisters due to autoimmune or allergic reactions.",
+    "treatment": "Treatment includes corticosteroids, immunosuppressive drugs, and proper wound care."
+  },
+  "Candidiasis": {
+    "desc": "Candidiasis is a fungal infection caused by Candida species, commonly affecting moist areas like skin folds.",
+    "treatment": "Use antifungal creams or oral antifungal medicines and keep the area dry."
+  },
+  "DrugEruption": {
+    "desc": "Drug eruption is a skin reaction caused by medications, resulting in rashes, redness, or itching.",
+    "treatment": "Stop the triggering medicine (with doctor advice) and use antihistamines or steroids."
+  },
+  "Eczema": {
+    "desc": "Eczema is a chronic inflammatory condition causing dry, itchy, and irritated skin.",
+    "treatment": "Use moisturizers, avoid triggers, apply steroid creams, and maintain skin hydration."
+  },
+  "Infestations_Bites": {
+    "desc": "This includes skin reactions caused by insect bites or infestations like mites or lice.",
+    "treatment": "Use antihistamines, soothing creams, or anti-parasitic medications."
+  },
+  "Lichen": {
+    "desc": "Lichen planus is an inflammatory condition causing purple, itchy, flat bumps on the skin.",
+    "treatment": "Use corticosteroids, antihistamines, and immune-modulating medications."
+  },
+  "Lupus": {
+    "desc": "Lupus is an autoimmune disease that can affect the skin, causing rashes especially on sun-exposed areas.",
+    "treatment": "Use sun protection, corticosteroids, and immunosuppressive drugs."
+  },
+  "Moles": {
+    "desc": "Moles are small, dark skin growths formed due to clusters of pigment cells and are usually harmless.",
+    "treatment": "No treatment needed unless changes occur; suspicious moles should be checked by a doctor."
+  },
+  "Psoriasis": {
+    "desc": "Psoriasis is a chronic autoimmune disease that speeds up skin cell production, causing red, scaly patches.",
+    "treatment": "Use topical creams, phototherapy, and systemic medications."
+  },
+  "Rosacea": {
+    "desc": "Rosacea causes redness and visible blood vessels on the face, sometimes with pimples.",
+    "treatment": "Avoid triggers, use gentle skincare, and apply prescribed medication."
+  },
+  "Seborrh_Keratoses": {
+    "desc": "Seborrheic keratoses are non-cancerous, wart-like skin growths that appear waxy or raised.",
+    "treatment": "No treatment needed unless for cosmetic reasons; removal can be done easily."
+  },
+  "SkinCancer": {
+    "desc": "Skin cancer occurs when abnormal skin cells grow uncontrollably and can become life-threatening if untreated.",
+    "treatment": "Early diagnosis is important; treatment includes surgery, radiation, or chemotherapy."
+  },
+  "Sun_Sunlight_Damage": {
+    "desc": "Skin damage caused by prolonged exposure to sunlight, leading to pigmentation, aging, and lesions.",
+    "treatment": "Use sunscreen, avoid sun exposure, and apply skin-repair treatments."
+  },
+  "Tinea": {
+    "desc": "Tinea is a fungal infection (ringworm) that affects skin, hair, or nails.",
+    "treatment": "Use antifungal creams or oral medication."
+  },
+  "Unknown_Normal": {
+    "desc": "This indicates normal or healthy skin with no visible disease detected.",
+    "treatment": "No treatment required; maintain good skincare routine."
+  },
+  "Vascular_Tumors": {
+    "desc": "Vascular tumors are growths formed from blood vessels, such as hemangiomas.",
+    "treatment": "Usually harmless; treatment includes laser therapy or surgery if needed."
+  },
+  "Vasculitis": {
+    "desc": "Vasculitis is inflammation of blood vessels that can cause rashes, spots, or ulcers on the skin.",
+    "treatment": "Treatment includes corticosteroids and immunosuppressive drugs."
+  },
+  "Vitiligo": {
+    "desc": "Vitiligo is a condition where skin loses its pigment, causing white patches.",
+    "treatment": "Light therapy, topical steroids, and depigmentation therapy."
+  },
+  "Warts": {
+    "desc": "Warts are small skin growths caused by the human papillomavirus (HPV).",
+    "treatment": "Salicylic acid, cryotherapy, or minor surgical removal."
+  }
+}

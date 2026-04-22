@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>History</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family:Poppins;
+    background:linear-gradient(135deg,#0b132b,#1c2541);
+    color:white;
+    margin:0;
+}
+
+/* MAIN BOX */
+.container{
+    margin-top:40px;
+    text-align:center;
+}
+
+/* TOTAL COUNT */
+.count{
+    color:#94a3b8;
+    margin-bottom:10px;
+}
+
+/* LIST */
+ul{
+    list-style:none;
+    padding:0;
+}
+
+/* ITEM CARD */
+li{
+    position: relative;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,255,255,0.2);
+
+    margin:15px auto;
+    padding:20px;
+    width:360px;
+    border-radius:16px;
+
+    box-shadow: 0 0 15px rgba(0,255,255,0.1);
+    transition:0.3s;
+
+    animation: fadeIn 0.4s ease;
+}
+
+li:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 0 25px rgba(0,255,255,0.4);
+}
+
+/* CHECKBOX */
+.select-item{
+    position:absolute;
+    top:15px;
+    left:15px;
+    transform: scale(1.3);
+    cursor:pointer;
+}
+
+/* TEXT */
+li b{
+    color:#22d3ee;
+}
+
+.label{
+    color:#94a3b8;
+}
+
+/* BUTTON */
+button{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* BACK BUTTON */
+/* BACK BUTTON FINAL FIX */
+.back-btn{
+    position: fixed;        /*  always top */
+    top: 20px;
+    left: 20px;
+
+    background: linear-gradient(45deg,#22c55e,#16a34a) !important;
+    color: white !important;
+
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+    z-index: 9999;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+/*  hover */
+.back-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 0 12px rgba(34,197,94,0.6);
+}
+
+/*  click */
+.back-btn:active{
+    transform: scale(0.95);
+}
+
+/* DELETE BUTTON */
+.delete-btn{
+    background: linear-gradient(45deg,#ff4d4d,#ff1a1a);
+    color:white;
+    font-weight:bold;
+}
+
+.delete-btn:hover{
+    transform: scale(1.08);
+}
+
+/* BULK ACTIONS */
+.bulk-actions{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.bulk-actions button{
+    background: linear-gradient(45deg,#22c55e,#16a34a); /*  green */
+    color:white;
+    font-weight: bold;
+}
+
+/* hover effect */
+.bulk-actions button:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(34,197,94,0.6);
+}
+
+/* EMPTY */
+.empty{
+    margin-top:30px;
+    color:#94a3b8;
+}
+
+/* LIGHT MODE */
+.light-mode{
+    background:#ffffff !important;
+    color:#000 !important;
+}
+
+.light-mode li{
+    background:#f2f2f2 !important;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2> Your Prediction History</h2>
+
+{% if history and history|length > 0 %}
+
+<div class="count">Total Records: {{ history|length }}</div>
+
+<!--  BULK BUTTONS -->
+<div class="bulk-actions">
+    <button onclick="selectAll()">✅ Select All</button>
+    <button onclick="deleteSelected()"> Delete Selected</button>
+</div>
+
+<ul>
+{% for item in history %}
+<li>
+
+<input type="checkbox" class="select-item" value="{{ item[0] }}">
+
+ <b>{{ item[2] }}</b><br>
+
+ <span class="label">Confidence:</span> {{ item[3] }}%<br>
+
+ <span class="label">{{ item[4] }}</span><br>
+
+<form method="POST" action="/delete_history/{{ item[0] }}">
+    <button class="delete-btn">🗑 Delete</button>
+</form>
+
+</li>
+{% endfor %}
+</ul>
+
+{% else %}
+
+<div class="empty">
+     No History Yet<br>
+</div>
+
+{% endif %}
+
+<button class="back-btn" onclick="goBack()">← Back</button>
+
+</div>
+
+<script>
+
+/* MODE */
+document.addEventListener("DOMContentLoaded", function(){
+    let savedMode = localStorage.getItem("mode");
+    if(savedMode === "light"){
+        document.body.classList.add("light-mode");
+    }
+});
+
+/* BACK */
+function goBack(){
+    window.history.back();
+}
+
+/* SELECT ALL */
+function selectAll(){
+    document.querySelectorAll(".select-item")
+    .forEach(cb => cb.checked = true);
+}
+
+/* DELETE SELECTED */
+function deleteSelected(){
+
+    let selected = document.querySelectorAll(".select-item:checked");
+
+    if(selected.length === 0){
+        alert("Select at least one");
+        return;
+    }
+
+    if(!confirm("Delete selected items?")) return;
+
+    selected.forEach(cb => {
+
+        let id = cb.value;
+
+        fetch("/delete_history/" + id, {
+            method: "POST"
+        }).then(() => {
+            cb.closest("li").remove();
+        });
+
+    });
+}
+
+</script>
+
+</body>
+</html>

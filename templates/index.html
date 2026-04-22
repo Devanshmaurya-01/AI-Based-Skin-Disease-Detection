@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DermaVision AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<!-- MENU -->
+<div class="menu" id="menuBtn" onclick="toggleMenu()">☰</div>
+
+<div class="menu-content" id="menuContent">
+   <p onclick="toggleMode()" id="modeText">Mode  </p>
+   <p onclick="changeLang('en')">English</p>
+   <p onclick="changeLang('hi')">Hindi</p>
+   <p onclick="logout()">Logout</p>
+</div>
+
+<div class="app-border">
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>🧬 DermaVision</h2>
+
+    <button onclick="showUpload()"> Upload</button>
+    <button onclick="showWebcam()"> Webcam</button>
+    <button onclick="window.location.href='/history'"> History</button>
+    <button> Assistant</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<h1 id="title">AI Skin Disease Dashboard</h1>
+
+<!-- UPLOAD -->
+<div id="upload" class="tab active">
+<div class="card">
+
+<div class="upload-box">
+ Upload Image
+<input type="file" id="file">
+</div>
+
+<button class="detect-btn" onclick="upload()">Detect</button>
+
+<div id="scanBox" style="display:none;">
+<p class="scan-text"> AI is scanning...</p>
+<div class="scanner"></div>
+</div>
+
+<div id="result"></div>
+
+<div id="infoBox" class="info-box" style="display:none;"></div>
+
+<div class="progress-bar">
+<div id="progress" class="progress"></div>
+</div>
+
+<div class="center-buttons">
+<button class="action-btn" onclick="generateReport()"> Report</button>
+<button class="action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+</div>
+
+</div>
+</div>
+
+<!-- WEBCAM -->
+<div id="webcamSection" style="display:none; text-align:center;">
+<div class="card">
+
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" style="display:none;"></canvas>
+
+<div class="webcam-top-buttons">
+<button class="webcam-btn" onclick="startCamera()"> Start Camera</button>
+<button class="webcam-btn" onclick="captureImage()"> Capture Image</button>
+<button class="webcam-btn" onclick="startLiveDetection()"> Live Detection</button>
+</div>
+
+<div id="scanBox_webcam" style="display:none;">
+<p class="scan-text"> AI is scanning...</p>
+<div class="scanner"></div>
+</div>
+
+<div id="result_webcam"></div>
+
+<div id="infoBox_webcam" class="info-box" style="display:none;"></div>
+
+<div class="progress-bar">
+<div id="progress_webcam" class="progress"></div>
+</div>
+
+<div class="center-buttons">
+<button class="action-btn" onclick="generateReport()"> Report</button>
+<button class="action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+let stream = null;
+let liveInterval;
+
+/*  DETECT FUNCTION FIXED */
+function sendImageToBackend(file, isWebcam=false){
+
+    let scanBox = isWebcam 
+        ? document.getElementById("scanBox_webcam")
+        : document.getElementById("scanBox");
+
+    scanBox.style.display = "block";
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/predict", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        scanBox.style.display = "none";
+
+        if(!data.result){
+            alert("No result");
+            return;
+        }
+
+        //  save source
+        localStorage.setItem("lastResult", JSON.stringify({
+            ...data,
+            source: isWebcam ? "webcam" : "upload"
+        }));
+
+        if(isWebcam){
+            document.getElementById("result_webcam").innerHTML =
+            " "+data.result+" ("+data.confidence+"%)";
+            document.getElementById("progress_webcam").style.width =
+            data.confidence+"%";
+            document.getElementById("infoBox_webcam").style.display="block";
+            document.getElementById("infoBox_webcam").innerHTML =
+            " "+data.desc+"<br><br> "+data.treatment;
+        } else {
+            document.getElementById("result").innerHTML =
+            " "+data.result+" ("+data.confidence+"%)";
+            document.getElementById("progress").style.width =
+            data.confidence+"%";
+            document.getElementById("infoBox").style.display="block";
+            document.getElementById("infoBox").innerHTML =
+            " "+data.desc+"<br><br> "+data.treatment;
+        }
+
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Detection failed");
+    });
+}
+
+/*============toggle menu=========*/
+function toggleMenu(){
+    let menu = document.getElementById("menuContent");
+    menu.classList.toggle("show");
+}
+
+document.addEventListener("click", function(e){
+    let menu = document.getElementById("menuContent");
+    let btn = document.getElementById("menuBtn");
+
+    if(!btn.contains(e.target) && !menu.contains(e.target)){
+        menu.classList.remove("show");
+    }
+});
+
+function toggleMode(){
+
+    document.body.classList.toggle("light-mode");
+
+    let modeText = document.getElementById("modeText");
+
+    if(document.body.classList.contains("light-mode")){
+        modeText.innerText = "Mode ";
+        localStorage.setItem("mode","light");
+    } else {
+        modeText.innerText = "Mode ";
+        localStorage.setItem("mode","dark");
+    }
+}
+
+function changeLang(lang){
+
+    if(lang === "hi"){
+        document.getElementById("title").innerText = "AI त्वचा रोग डैशबोर्ड";
+    } else {
+        document.getElementById("title").innerText = "AI Skin Disease Dashboard";
+    }
+
+    localStorage.setItem("lang", lang);
+}
+
+function logout(){
+
+    if(confirm("Are you sure you want to logout?")){
+        window.location.href = "/logout"; // backend route
+    }
+}
+
+function generateReport(){
+    window.open("/report","_blank"); //  BEST
+}
+
+function downloadPDF(){
+    window.open("/report?pdf=true","_blank");
+}
+
+ 
+
+/*  CLEAR UI */
+function clearUI(){
+
+    localStorage.removeItem("lastResult");
+
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("progress").style.width = "0%";
+    document.getElementById("infoBox").style.display = "none";
+
+    document.getElementById("result_webcam").innerHTML = "";
+    document.getElementById("progress_webcam").style.width = "0%";
+    document.getElementById("infoBox_webcam").style.display = "none";
+}
+
+/* UPLOAD */
+function upload(){
+    clearUI();
+    let file=document.getElementById("file").files[0];
+    if(!file) return alert("Select file");
+    sendImageToBackend(file,false);
+}
+
+/* CAMERA */
+function startCamera(){
+    const video = document.getElementById("video");
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(s => {
+        stream = s;
+        video.srcObject = stream;
+    })
+    .catch(() => alert("Camera not working"));
+}
+
+function stopCamera(){
+    if(stream){
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+}
+
+/* CAPTURE */
+function captureImage(){
+    clearUI();
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    ctx.drawImage(video, 0, 0);
+
+    canvas.toBlob(blob => sendImageToBackend(blob,true));
+}
+
+/* LIVE */
+function startLiveDetection(){
+    clearInterval(liveInterval);
+    liveInterval = setInterval(() => {
+        if(stream){
+            captureImage();
+        }
+    }, 2000);
+}
+
+/* SWITCH */
+function showUpload(){
+    clearUI();
+    stopCamera();
+    localStorage.setItem("activeTab","upload");
+    document.getElementById("upload").style.display="block";
+    document.getElementById("webcamSection").style.display="none";
+}
+
+function showWebcam(){
+    clearUI();
+    localStorage.setItem("activeTab","webcam");
+    document.getElementById("upload").style.display="none";
+    document.getElementById("webcamSection").style.display="block";
+}
+
+
+/* LOAD */
+window.onload = function(){
+
+    let tab = localStorage.getItem("activeTab");
+
+    if(tab==="webcam"){
+        showWebcam();
+    } else {
+        showUpload();
+    }
+}
+
+window.addEventListener("load", () => {
+
+    // Mode restore
+    let mode = localStorage.getItem("mode");
+    if(mode === "light"){
+        document.body.classList.add("light-mode");
+        document.getElementById("modeText").innerText = "Mode ";
+    }
+
+    // Language restore
+    let lang = localStorage.getItem("lang");
+    if(lang){
+        changeLang(lang);
+    }
+});
+
+</script>
+
+</body>
+</html>
