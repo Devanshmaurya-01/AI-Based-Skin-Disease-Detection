@@ -49,7 +49,7 @@ An intelligent web application that uses **Deep Learning & Computer Vision** to 
 
 ---
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
 ### 1️ Clone the repository
 
@@ -71,7 +71,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Run the application
+### 4️ Run the application
 
 ```
 python app.py
